@@ -1,42 +1,4 @@
-
-#include <stdio.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "driver/gpio.h"
-#include "sdkconfig.h"
-
-#define E_GPIO 23
-#define RS_GPIO 19
-#define D4_GPIO 18
-#define D5_GPIO 17
-#define D6_GPIO 16
-#define D7_GPIO 21
-char ldata = 0;
-int pins[6] = {E_GPIO, RS_GPIO, D4_GPIO, D5_GPIO, D6_GPIO, D7_GPIO};
-
-void initialization();
-void lcd_command(unsigned char cmd, bool type);
-void set_nibble(unsigned char bits);
-void write_word(const char *word);
-
-void app_main(void)
-{
-
-	for (int i = 0; i < 6; ++i)
-	{
-		/* Setting pins as GPIO */
-		gpio_pad_select_gpio(pins[i]);
-
-		/* Set the GPIO as a push/pull output */
-		gpio_set_direction(pins[i], GPIO_MODE_OUTPUT);
-
-		gpio_set_level(pins[i], 0);
-	}
-
-	initialization();
-
-	write_word("Hello There");
-}
+#include <LCDinterface.h>
 
 void lcd_command(unsigned char cmd, bool type)
 {
@@ -66,6 +28,7 @@ void lcd_command(unsigned char cmd, bool type)
 
 void initialization()
 {
+
 	vTaskDelay(15 / portTICK_PERIOD_MS); //power on delay
 
 	lcd_command(0x02, false); // 4bit mode on
@@ -92,4 +55,28 @@ void write_word(const char *word)
 		lcd_command(*word, true);
 		word++;
 	}
+}
+
+void setupLCD(int8_t setPins[6])
+{
+	E_GPIO = setPins[0];
+	RS_GPIO = setPins[1];
+	D4_GPIO = setPins[2];
+	D5_GPIO = setPins[3];
+	D6_GPIO = setPins[4];
+	D7_GPIO = setPins[5];
+
+	for (int i = 0; i < 6; ++i)
+	{
+		pins[i] = setPins[i];
+		/* Setting pins as GPIO */
+		gpio_pad_select_gpio(pins[i]);
+
+		/* Set the GPIO as a push/pull output */
+		gpio_set_direction(pins[i], GPIO_MODE_OUTPUT);
+
+		gpio_set_level(pins[i], 0);
+	}
+
+	initialization();
 }

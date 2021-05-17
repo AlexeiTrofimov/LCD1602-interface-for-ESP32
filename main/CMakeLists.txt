@@ -1,4 +1,4 @@
 idf_component_register(
-    SRCS "main.c"
+    SRCS "LCDinterface.c"
     INCLUDE_DIRS "."
 )
