@@ -35,7 +35,7 @@ void set_nibble(unsigned char c)
 	}
 }
 
-void setupLCD(int8_t setPins[6])
+void setupLCD(uint8_t setPins[6])
 {
 	E_GPIO = setPins[0];
 	RS_GPIO = setPins[1];
@@ -60,24 +60,40 @@ void setupLCD(int8_t setPins[6])
 
 	lcd_command(0x02, false); // 4bit mode on
 
-	lcd_command(0x28, false); // init 5*7 matrix
+	lcd_command(0x28, false); // init 5*7 matrix with two rows
 	lcd_command(0x01, false); // clear display
 	lcd_command(0x0C, false); // cursor off
 	lcd_command(0x06, false); // shift cursor to right
 }
 
-void printLCD(const char *word)
+void printLCD(const char *msg)
 {
-	while ((*word) != 0)
+	while ((*msg) != 0)
 	{
-		lcd_command(*word, true);
-		word++;
+		lcd_command(*msg, true);
+		msg++;
 	}
 }
 
-void setCursor(int8_t x, int8_t y){
+void setCursor(uint8_t x, uint8_t y){
 	lcd_command(0x02,false); //Resetting cursor
 	for (int8_t i = 0; i < (y*40+x); ++i){  //Cursor moves to second row after 40th digit
 		lcd_command(0x14,false);
 	}
 }
+
+void scrollLCD(uint8_t amount){
+	for (uint8_t i = 0; i < amount; ++i){
+		lcd_command(0x18,false);
+	}
+}
+
+void customChar(char *bits ,uint8_t addr){
+	lcd_command(0x40+addr*8,false); //Custom character takes 8 CRAM locations
+
+	for (int i = 0; i < 8; ++i ){
+		lcd_command(bits[i], true);
+	}
+	lcd_command(0x80,false);
+}
+
