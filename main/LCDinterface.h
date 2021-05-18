@@ -18,10 +18,10 @@ int8_t pins[6];
 
 char ldata = 0;
 
-void initialization();
 void lcd_command(unsigned char cmd, bool type);
 void set_nibble(unsigned char bits);
-void write_word(const char *word);
 void setupLCD(int8_t pins[6]);
+void printLCD(const char *word);
+void setCursor(int8_t x, int8_t y);
 
 #endif

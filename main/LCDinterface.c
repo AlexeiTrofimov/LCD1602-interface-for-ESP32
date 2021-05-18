@@ -26,34 +26,12 @@ void lcd_command(unsigned char cmd, bool type)
 	vTaskDelay(3 / portTICK_PERIOD_MS);
 }
 
-void initialization()
-{
-
-	vTaskDelay(15 / portTICK_PERIOD_MS); //power on delay
-
-	lcd_command(0x02, false); // 4bit mode on
-
-	lcd_command(0x28, false); // init 5*7 matrix
-	lcd_command(0x01, false); // clear display
-	lcd_command(0x0C, false); // cursor off
-	lcd_command(0x06, false); // shift cursor to right
-}
-
 void set_nibble(unsigned char c)
 {
 	for (int i = 0; i < 4; ++i)
 	{
 		int b = ((c >> i) & 1);
 		gpio_set_level(pins[i + 2], b);
-	}
-}
-
-void write_word(const char *word)
-{
-	while ((*word) != 0)
-	{
-		lcd_command(*word, true);
-		word++;
 	}
 }
 
@@ -78,5 +56,28 @@ void setupLCD(int8_t setPins[6])
 		gpio_set_level(pins[i], 0);
 	}
 
-	initialization();
+	vTaskDelay(15 / portTICK_PERIOD_MS); //power on delay
+
+	lcd_command(0x02, false); // 4bit mode on
+
+	lcd_command(0x28, false); // init 5*7 matrix
+	lcd_command(0x01, false); // clear display
+	lcd_command(0x0C, false); // cursor off
+	lcd_command(0x06, false); // shift cursor to right
+}
+
+void printLCD(const char *word)
+{
+	while ((*word) != 0)
+	{
+		lcd_command(*word, true);
+		word++;
+	}
+}
+
+void setCursor(int8_t x, int8_t y){
+	lcd_command(0x02,false); //Resetting cursor
+	for (int8_t i = 0; i < (y*40+x); ++i){  //Cursor moves to second row after 40th digit
+		lcd_command(0x14,false);
+	}
 }
